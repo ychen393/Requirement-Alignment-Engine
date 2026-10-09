@@ -1,0 +1,50 @@
+# Environment and secrets (examples remain versioned)
+.env
+.env.*
+!.env.example
+!**/.env.example
+!**/.env.*.example
+*.pem
+*.key
+*.p12
+*.pfx
+*credentials*.json
+*secrets*.json
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+.venv/
+venv/
+dist/
+build/
+*.egg-info/
+
+# Node / Next.js
+node_modules/
+.next/
+.npm-cache/
+.chrome-qa/
+
+# Local databases, logs, generated artifacts, and user data
+*.db
+*.sqlite
+*.sqlite3
+*.log
+logs/
+artifacts/
+data/
+local_data/
+user_data/
+uploads/
+
+# Editor and operating-system files
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
