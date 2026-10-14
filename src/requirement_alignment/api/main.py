@@ -4,7 +4,7 @@ import os
 
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, HTMLResponse
 from pydantic import ValidationError
 
 from requirement_alignment.ai import (
@@ -26,6 +26,9 @@ from requirement_alignment.ai import (
 from requirement_alignment.ai.change_analyzer import ChangeProposalBundle
 from requirement_alignment.ai.approach_generator import generate_consulting_approach
 from requirement_alignment.approach import ConsultingApproach
+from requirement_alignment.consulting import ProposalDocument
+from requirement_alignment.proposal_generator import generate_proposal
+from requirement_alignment.html_renderer import render_proposal_html
 from requirement_alignment.api.schemas import (
     AlignRequest,
     AnalyzeRequest,
@@ -42,6 +45,7 @@ from requirement_alignment.api.schemas import (
 )
 from requirement_alignment.models import RawRequirement, WorkflowState, RequirementVersion
 from pydantic import BaseModel
+from uuid import UUID
 
 
 class ApproachRequest(BaseModel):
@@ -51,6 +55,16 @@ class ApproachRequest(BaseModel):
 class ApproachResponse(BaseModel):
     mode: AppMode
     proposal: Proposal[ConsultingApproach]
+
+
+class ProposalGenerateRequest(BaseModel):
+    project_id: UUID
+    requirement: Proposal[RequirementVersion]
+    approach: ConsultingApproach
+
+
+class ProposalRenderRequest(BaseModel):
+    proposal: ProposalDocument
 
 
 class ConfirmationRequiredError(ValueError):
@@ -220,6 +234,28 @@ def create_app(
         else:
             proposal = generate_consulting_approach(requirement, active_provider)
         return ApproachResponse(mode=active_mode, proposal=proposal)
+
+    @app.post("/consulting/proposal", response_model=ProposalDocument)
+    def consulting_proposal(body: ProposalGenerateRequest) -> ProposalDocument:
+        # This composer uses reviewed structured inputs; no fabricated research.
+        requirement = _confirmed(body.requirement, "RequirementVersion")
+        return generate_proposal(requirement, body.approach, project_id=body.project_id)
+
+    @app.post("/consulting/proposal/preview", response_class=HTMLResponse)
+    def consulting_proposal_preview(body: ProposalRenderRequest) -> HTMLResponse:
+        return HTMLResponse(
+            render_proposal_html(body.proposal, allow_draft_preview=True),
+            headers={"Cache-Control": "no-store", "Content-Security-Policy": "default-src 'none'; style-src 'unsafe-inline'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'"},
+        )
+
+    @app.post("/consulting/proposal/export", response_class=HTMLResponse)
+    def consulting_proposal_export(body: ProposalRenderRequest) -> HTMLResponse:
+        # Status is caller-supplied; this is NOT authenticated approval.
+        # Keep the endpoint a draft-only artifact until persistent server review exists.
+        return HTMLResponse(
+            render_proposal_html(body.proposal, allow_draft_preview=True),
+            headers={"Cache-Control": "no-store", "Content-Disposition": 'attachment; filename="proposal-DRAFT.html"', "Content-Security-Policy": "default-src 'none'; style-src 'unsafe-inline'; base-uri 'none'; frame-ancestors 'none'"},
+        )
 
     @app.post("/changes/analyze", response_model=ChangeProposalResponse)
     def change(body: ChangeRequest) -> ChangeProposalResponse:
