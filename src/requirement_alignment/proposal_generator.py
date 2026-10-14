@@ -43,8 +43,8 @@ def generate_proposal(
     for workstream in approach.workstreams:
         section(ProposalSectionType.WORKSTREAMS, workstream.title,
                 paragraphs=[workstream.objective],
-                bullets=[*"Methods: " + m for m in workstream.methods] +
-                [*"Data required: " + d for d in workstream.data_required])
+                bullets=["Methods: " + m for m in workstream.methods] +
+                ["Data required: " + d for d in workstream.data_required])
     outputs = list(dict.fromkeys(
         [*requirement.expected_outputs, *(d for w in approach.workstreams for d in w.deliverables)]
     ))
