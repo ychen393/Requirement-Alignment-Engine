@@ -24,6 +24,8 @@ from requirement_alignment.ai import (
     generate_requirement_proposal_with_ai,
 )
 from requirement_alignment.ai.change_analyzer import ChangeProposalBundle
+from requirement_alignment.ai.approach_generator import generate_consulting_approach
+from requirement_alignment.approach import ConsultingApproach
 from requirement_alignment.api.schemas import (
     AlignRequest,
     AnalyzeRequest,
@@ -38,7 +40,17 @@ from requirement_alignment.api.schemas import (
     RequirementProposalResponse,
     StatusResponse,
 )
-from requirement_alignment.models import RawRequirement, WorkflowState
+from requirement_alignment.models import RawRequirement, WorkflowState, RequirementVersion
+from pydantic import BaseModel
+
+
+class ApproachRequest(BaseModel):
+    requirement: Proposal[RequirementVersion]
+
+
+class ApproachResponse(BaseModel):
+    mode: AppMode
+    proposal: Proposal[ConsultingApproach]
 
 
 class ConfirmationRequiredError(ValueError):
@@ -186,6 +198,28 @@ def create_app(
         else:
             proposal = generate_execution_plan_with_ai(requirement, active_provider)  # type: ignore[arg-type]
         return PlanProposalResponse(mode=active_mode, proposal=proposal)
+
+    @app.post("/consulting/approach", response_model=ApproachResponse)
+    def consulting_approach(body: ApproachRequest) -> ApproachResponse:
+        active_mode, active_provider = runtime()
+        requirement = _confirmed(body.requirement, "RequirementVersion")
+        if active_mode is AppMode.DEMO:
+            from requirement_alignment.approach import Workstream
+            proposal = Proposal(payload=ConsultingApproach(
+                based_on_requirement_version_id=requirement.id,
+                rationale="DEMO ONLY: illustrative consulting approach, not client advice.",
+                workstreams=[Workstream(
+                    title="Illustrative discovery",
+                    objective="Clarify the confirmed requirement",
+                    methods=["Stakeholder interviews"],
+                    deliverables=["Discovery summary"],
+                    data_required=["Client-approved inputs"],
+                )],
+                unknowns=["Demo content is synthetic"],
+            ))
+        else:
+            proposal = generate_consulting_approach(requirement, active_provider)
+        return ApproachResponse(mode=active_mode, proposal=proposal)
 
     @app.post("/changes/analyze", response_model=ChangeProposalResponse)
     def change(body: ChangeRequest) -> ChangeProposalResponse:
