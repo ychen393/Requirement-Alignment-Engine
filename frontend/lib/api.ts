@@ -10,7 +10,10 @@ import type {
   RequirementVersion,
 } from "./types";
 
-export const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8100";
+// The browser calls public same-origin paths routed by root vercel.json.
+// Development still uses the local FastAPI server on port 8100.
+export const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL ??
+  (process.env.NODE_ENV === "production" ? "" : "http://localhost:8100");
 
 async function request<T>(path: string, body?: unknown): Promise<T> {
   const response = await fetch(`${API_BASE}${path}`, {
