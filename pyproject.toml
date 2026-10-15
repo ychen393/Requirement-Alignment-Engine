@@ -23,3 +23,6 @@ testpaths = ["tests"]
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.vercel]
+entrypoint = "src.requirement_alignment.api.main:app"
