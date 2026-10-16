@@ -25,4 +25,4 @@ testpaths = ["tests"]
 where = ["src"]
 
 [tool.vercel]
-entrypoint = "src.requirement_alignment.api.main:app"
+entrypoint = "src.requirement_alignment.api:app"
