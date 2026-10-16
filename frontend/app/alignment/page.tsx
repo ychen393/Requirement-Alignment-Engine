@@ -10,9 +10,7 @@ import {
   alignRequirement,
   analyzeRequirement,
   confirm,
-  generatePlan,
   loadWorkspace,
-  SAMPLE_REQUEST,
   saveWorkspace,
 } from "@/lib/api";
 import type { AnalyzeResponse, ClarificationQuestion as Question, Proposal, RequirementVersion } from "@/lib/types";
@@ -32,7 +30,8 @@ export default function AlignmentPage() {
     async function prepare() {
       try {
         const stored = loadWorkspace();
-        const base = stored.analysis ?? await analyzeRequirement(SAMPLE_REQUEST);
+        const base = stored.analysis;
+        if (!base) { router.replace("/new"); return; }
         setAnalysis(base);
         const qs = base.clarification_questions.payload.map((item) => ({
           ...item,
@@ -105,9 +104,8 @@ export default function AlignmentPage() {
     setLoading(true); setError("");
     try {
       const confirmedRequirement = confirm({ ...proposal, payload: requirement });
-      const planned = await generatePlan(confirmedRequirement);
-      saveWorkspace({ requirementV1: confirmedRequirement, planV1: confirm(planned.proposal) });
-      router.push("/execution");
+      saveWorkspace({ requirementV1: confirmedRequirement, approach: undefined, consultingProposal: undefined });
+      router.push("/approach");
     } catch (caught) { setError(caught instanceof Error ? caught.message : "确认失败"); }
     finally { setLoading(false); }
   }
@@ -117,13 +115,13 @@ export default function AlignmentPage() {
 
   return (
     <main className="page-shell alignment-page">
-      <div className="page-top"><Breadcrumbs items={["模型能力 Benchmark", "Requirement V1"]} /><ProgressSteps current={3} /></div>
-      <div className="alignment-title"><div><h1>需求对齐 <span className="status-pill orange">待确认</span></h1><p>完善需求核心内容，回答澄清问题，确认后将生成执行计划。</p></div></div>
+      <div className="page-top"><Breadcrumbs items={["Client Brief", "Requirement V1"]} /><ProgressSteps current={3} /></div>
+      <div className="alignment-title"><div><h1>需求对齐 <span className="status-pill orange">待确认</span></h1><p>完善需求核心内容，回答澄清问题，确认后进入咨询方法论与 Workstreams 设计。</p></div></div>
       <div className="alignment-grid">
         <aside className="source-column">
           <h2>原始需求</h2>
           <blockquote>{analysis.raw_requirement.payload.description}</blockquote>
-          <dl><div><dt>来源</dt><dd>领导需求</dd></div><div><dt>提交时间</dt><dd>2026-09-28 14:30</dd></div><div><dt>需求 ID</dt><dd>{analysis.raw_requirement.payload.id.slice(0, 8)}</dd></div></dl>
+          <dl><div><dt>来源</dt><dd>Client Brief</dd></div><div><dt>提交时间</dt><dd>当前会话</dd></div><div><dt>需求 ID</dt><dd>{analysis.raw_requirement.payload.id.slice(0, 8)}</dd></div></dl>
           <div className="landscape" aria-hidden="true"><i/><i/><i/></div>
         </aside>
         {requirement ? <RequirementDocument requirement={requirement} onChange={setRequirement} /> : <section className="paper-panel"><h2>先完成需求澄清</h2><p>回答右侧问题后，再根据你的真实答案生成可编辑的需求草案。</p><button className="button primary" disabled={draftLoading || answered !== questions.length} onClick={prepareRequirementDraft}>{draftLoading ? "正在生成草案…" : "基于澄清答案生成需求草案 →"}</button></section>}
@@ -132,7 +130,7 @@ export default function AlignmentPage() {
           <div className="question-list">{questions.map((question, index) => <ClarificationQuestion key={question.id} question={question} index={index} onAnswer={(answer) => updateAnswer(question.id, answer)} />)}</div>
         </aside>
       </div>
-      <div className="sticky-confirm"><div><b>确认后将基于当前需求生成执行计划。</b><span>后续需求变化不会覆盖当前版本，而会创建新的版本。</span></div><button className="button primary" onClick={confirmRequirement} disabled={loading || !requirement || !proposal || answered !== questions.length}>{loading ? "正在生成计划…" : "确认 Requirement V1 →"}</button></div>
+      <div className="sticky-confirm"><div><b>确认后将进入 Consulting Approach。</b><span>后续需求变化不会覆盖当前版本，而会创建新的版本。</span></div><button className="button primary" onClick={confirmRequirement} disabled={loading || !requirement || !proposal || answered !== questions.length}>{loading ? "正在确认…" : "确认 Requirement V1 →"}</button></div>
       {error && <p className="error-message floating-error">{error}</p>}
     </main>
   );
