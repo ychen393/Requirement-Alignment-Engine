@@ -1,5 +1,7 @@
 import type {
   AnalyzeResponse,
+  ConsultingApproach,
+  ConsultingProposalDocument,
   ChangeBundle,
   ClarificationQuestion,
   CompletionEvaluation,
@@ -10,7 +12,10 @@ import type {
   RequirementVersion,
 } from "./types";
 
-export const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8100";
+// The browser calls public same-origin paths routed by root vercel.json.
+// Development still uses the local FastAPI server on port 8100.
+export const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL ??
+  (process.env.NODE_ENV === "production" ? "" : "http://localhost:8100");
 
 async function request<T>(path: string, body?: unknown): Promise<T> {
   const response = await fetch(`${API_BASE}${path}`, {
@@ -28,9 +33,9 @@ async function request<T>(path: string, body?: unknown): Promise<T> {
 export const analyzeRequirement = (text: string) =>
   request<AnalyzeResponse>("/requirements/analyze", {
     request: text,
-    title: "模型能力 Benchmark",
-    submitted_by: "Yihan",
-    source: "领导需求",
+    title: "Client Brief",
+    submitted_by: "Consultant",
+    source: "Client brief",
   });
 
 export const alignRequirement = (
@@ -82,6 +87,8 @@ export type WorkspaceState = {
   planV1?: Proposal<ExecutionPlan>;
   change?: Proposal<ChangeBundle>;
   completion?: Proposal<CompletionEvaluation>;
+  approach?: Proposal<ConsultingApproach>;
+  consultingProposal?: ConsultingProposalDocument;
 };
 
 export function loadWorkspace(): WorkspaceState {
@@ -115,4 +122,14 @@ export async function bootstrapV1(): Promise<WorkspaceState> {
   const planned = await generatePlan(requirementV1);
   const planV1 = confirm(planned.proposal);
   return saveWorkspace({ analysis, requirementV1, planV1 });
+}
+
+export const generateConsultingApproach = (requirement:Proposal<RequirementVersion>) =>
+  request<{mode:string;proposal:Proposal<ConsultingApproach>}>("/consulting/approach",{requirement});
+export const generateConsultingProposal = (project_id:string,requirement:Proposal<RequirementVersion>,approach:ConsultingApproach) =>
+  request<ConsultingProposalDocument>("/consulting/proposal",{project_id,requirement,approach});
+export async function previewConsultingProposal(proposal:ConsultingProposalDocument):Promise<string>{
+  const response=await fetch(`${API_BASE}/consulting/proposal/preview`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({proposal})});
+  if(!response.ok)throw new Error(`HTML Preview failed (${response.status})`);
+  return response.text();
 }

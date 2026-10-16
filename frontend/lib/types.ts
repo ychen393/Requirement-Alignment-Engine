@@ -167,3 +167,20 @@ export interface AnalyzeResponse {
   analysis: Proposal<RequirementAnalysis>;
   clarification_questions: Proposal<ClarificationQuestion[]>;
 }
+
+export interface ConsultingWorkstream {
+  id:string; title:string; objective:string; methods:string[];
+  activities:string[]; deliverables:string[]; data_required:string[]; assumptions:string[];
+}
+export interface ConsultingApproach {
+  based_on_requirement_version_id:string; rationale:string;
+  workstreams:ConsultingWorkstream[]; unknowns:string[]; proposed_timeline:string|null;
+}
+export interface ProposalBlock {type:"PARAGRAPH"|"BULLETS"|"KEY_MESSAGE";text?:string|null;items:string[]}
+export interface ConsultingSection {id:string;type:string;heading:string;blocks:ProposalBlock[];claim_refs:string[];order:number}
+export interface ConsultingProposalDocument {
+  id:string; project_id:string; based_on_requirement_version_id:string;
+  version_number:number;title:string;executive_summary:string;
+  sections:ConsultingSection[]; claims:Array<{id:string;text:string;provenance:string;source_refs:string[];explicit_assumption:boolean}>;
+  status:"DRAFT"|"REVIEW_REQUIRED"|"APPROVED_FOR_EXPORT";
+}
