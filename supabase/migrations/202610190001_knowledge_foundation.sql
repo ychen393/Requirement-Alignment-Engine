@@ -75,15 +75,17 @@ create policy kb_org_read on public.kb_organizations for select to authenticated
     where m.organization_id = id and m.user_id = (select auth.uid())));
 create policy kb_project_read on public.kb_projects for select to authenticated
   using (exists (select 1 from public.kb_memberships m
-    where m.organization_id = organization_id and m.user_id = (select auth.uid())));
+    where m.organization_id = kb_projects.organization_id and m.user_id = (select auth.uid())));
+create policy kb_access_self on public.kb_document_access for select to authenticated
+  using (user_id = (select auth.uid()));
 create policy kb_doc_read on public.kb_documents for select to authenticated
   using (
     state='READY'
-    and exists (select 1 from public.kb_memberships m where m.organization_id=organization_id and m.user_id=(select auth.uid()))
-    and exists (select 1 from public.kb_document_access a where a.document_id=id and a.user_id=(select auth.uid()))
+    and exists (select 1 from public.kb_memberships m where m.organization_id=kb_documents.organization_id and m.user_id=(select auth.uid()))
+    and exists (select 1 from public.kb_document_access a where a.document_id=kb_documents.id and a.user_id=(select auth.uid()))
   );
 create policy kb_chunk_read on public.kb_chunks for select to authenticated
-  using (exists (select 1 from public.kb_documents d where d.id=document_id and d.organization_id=organization_id));
+  using (exists (select 1 from public.kb_documents d where d.id=kb_chunks.document_id and d.organization_id=kb_chunks.organization_id));
 -- Deliberately NO public client write policies. Ingestion must be performed by
 -- an authenticated, authorization-checking backend, not directly from browsers.
 -- The storage bucket will be created PRIVATE via a separate provisioning step;
