@@ -7,7 +7,9 @@ const links = [
   {href:"/",label:"工作台"},
   {href:"/new",label:"Client Brief"},
   {href:"/approach",label:"Consulting Approach"},
-  {href:"/proposal",label:"Proposal Studio"}
+  {href:"/proposal",label:"Proposal Studio"},
+  {href:"/knowledge",label:"知识库"},
+  {href:"/login",label:"登录"}
 ];
 export function TopNavigation() {
   const pathname=usePathname();
