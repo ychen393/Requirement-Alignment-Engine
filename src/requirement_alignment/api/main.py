@@ -2,7 +2,7 @@
 
 import os
 
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, Header, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, HTMLResponse
 from pydantic import ValidationError
@@ -29,6 +29,8 @@ from requirement_alignment.approach import ConsultingApproach
 from requirement_alignment.consulting import ProposalDocument
 from requirement_alignment.proposal_generator import generate_proposal
 from requirement_alignment.html_renderer import render_proposal_html
+from requirement_alignment.auth_verifier import AuthConfiguration, SupabaseAuthVerifier, AuthenticationError
+from requirement_alignment.knowledge_repository import KnowledgeReaderConfig, SupabaseKnowledgeReader
 from requirement_alignment.api.schemas import (
     AlignRequest,
     AnalyzeRequest,
@@ -145,6 +147,30 @@ def create_app(
         except AIConfigurationError:
             return StatusResponse(mode=None, status="configuration_required")
         return StatusResponse(mode=active_mode, status="ok")
+
+    @app.get("/knowledge/documents")
+    def knowledge_documents(organization_id: UUID, authorization: str | None = Header(default=None)):
+        """Authenticated scoped read; PostgreSQL RLS enforces membership + grants."""
+        url = os.getenv("SUPABASE_URL", "")
+        key = os.getenv("SUPABASE_PUBLISHABLE_KEY", "")
+        if not url or not key:
+            raise HTTPException(status_code=503, detail="Knowledge access is not configured")
+        if not authorization:
+            raise HTTPException(status_code=401, detail="Bearer token required")
+        try:
+            config = AuthConfiguration(url=url, publishable_key=key)
+            SupabaseAuthVerifier(config).verify(authorization)
+            token = authorization.split(" ", 1)[1].strip()
+            return SupabaseKnowledgeReader(KnowledgeReaderConfig(
+                url=url, publishable_key=key
+            )).search_documents(token, str(organization_id))
+        except AuthenticationError:
+            raise HTTPException(status_code=401, detail="Authentication failed")
+        except Exception as exc:
+            # Avoid leaking upstream credentials, identity or raw DB errors.
+            if isinstance(exc, HTTPException):
+                raise
+            raise HTTPException(status_code=502, detail="Knowledge read failed")
 
     @app.post("/requirements/analyze", response_model=AnalyzeResponse)
     def analyze(body: AnalyzeRequest) -> AnalyzeResponse:
