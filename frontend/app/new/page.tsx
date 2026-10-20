@@ -2,12 +2,12 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { ProgressSteps } from "@/components/ProgressSteps";
-import { analyzeRequirement,saveWorkspace } from "@/lib/api";
+import { analyzeRequirement,saveWorkspace,clearWorkspace } from "@/lib/api";
 import type { AnalyzeResponse } from "@/lib/types";
 export default function ClientBriefPage(){
  const router=useRouter(),[text,setText]=useState(""),[result,setResult]=useState<AnalyzeResponse>(),
  [loading,setLoading]=useState(false),[error,setError]=useState("");
- async function analyze(){setLoading(true);setError("");try{
+ async function analyze(){setLoading(true);setError("");setResult(undefined);clearWorkspace();try{
  const data=await analyzeRequirement(text);if(data.mode==="DEMO"){setError("DEMO 模式仅返回固定 Benchmark 样例。请配置真实模型后再分析客户需求。");return;}if(data.raw_requirement.payload.description.trim()!==text.trim()){setError("返回的需求与本次输入不一致，已阻止错误结果。");return;}setResult(data);saveWorkspace({analysis:data,requirementV1:undefined,approach:undefined,consultingProposal:undefined});
  }catch(e){setError(e instanceof Error?e.message:"分析失败")}finally{setLoading(false)}}
  return <main className="page-shell compact-page"><div className="page-top"><ProgressSteps current={result?2:1}/></div>
