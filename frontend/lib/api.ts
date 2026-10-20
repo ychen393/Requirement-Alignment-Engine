@@ -100,7 +100,11 @@ export function loadWorkspace(): WorkspaceState {
   }
 }
 
-export function clearWorkspace(): void {\n  if (typeof window !== "undefined") sessionStorage.removeItem(key);\n}\n\nexport function saveWorkspace(patch: Partial<WorkspaceState>): WorkspaceState {
+export function clearWorkspace(): void {
+  if (typeof window !== "undefined") sessionStorage.removeItem(key);
+}
+
+export function saveWorkspace(patch: Partial<WorkspaceState>): WorkspaceState {
   const next = { ...loadWorkspace(), ...patch };
   sessionStorage.setItem(key, JSON.stringify(next));
   return next;
