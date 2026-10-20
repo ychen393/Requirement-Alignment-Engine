@@ -181,6 +181,8 @@ def create_app(
                 CLARIFICATION_QUESTIONS,
                 RAW_REQUIREMENT,
             )
+            if body.request.strip() != RAW_REQUIREMENT.description.strip():
+                raise HTTPException(status_code=409, detail="DEMO mode only supports the canonical benchmark fixture; arbitrary client briefs require AI mode")
 
             return AnalyzeResponse(
                 mode=active_mode,
