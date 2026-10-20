@@ -15,6 +15,7 @@
     { "source": "/plans/(.*)", "destination": { "service": "app" } },
     { "source": "/changes/(.*)", "destination": { "service": "app" } },
     { "source": "/completion/(.*)", "destination": { "service": "app" } },
+    { "source": "/knowledge/(.*)", "destination": { "service": "app" } },
     { "source": "/consulting/(.*)", "destination": { "service": "app" } },
     { "source": "/health", "destination": { "service": "app" } },
     { "source": "/(.*)", "destination": { "service": "frontend" } }
