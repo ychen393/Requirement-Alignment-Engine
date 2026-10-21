@@ -100,10 +100,11 @@ class OpenAICompatibleProvider:
         user_prompt: str,
         response_model: type[ResponseT],
     ) -> ResponseT:
+        is_deepseek = self.base_url.startswith("https://api.deepseek.com")
         payload = {
             "model": self.model,
             "messages": [
-                {"role": "system", "content": system_prompt},
+                {"role": "system", "content": (system_prompt + "\\nReturn a valid JSON object matching the required fields.") if is_deepseek else system_prompt},
                 {"role": "user", "content": user_prompt},
             ],
             "response_format": {
@@ -115,6 +116,9 @@ class OpenAICompatibleProvider:
                 },
             },
         }
+        if is_deepseek:
+            payload["response_format"] = {"type": "json_object"}
+            payload["max_tokens"] = 8192
         request = Request(
             f"{self.base_url}/chat/completions",
             data=json.dumps(payload).encode("utf-8"),

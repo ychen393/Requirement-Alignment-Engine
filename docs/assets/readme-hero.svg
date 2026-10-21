@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="540" viewBox="0 0 1200 540" role="img" aria-label="Requirement Alignment Engine editorial diagram showing the transition from client brief through clarification to structured proposal">
+<defs>
+ <linearGradient id="bg" x2="1" y2="1"><stop stop-color="#111b22"/><stop offset=".58" stop-color="#17292d"/><stop offset="1" stop-color="#263432"/></linearGradient>
+ <linearGradient id="gold" x2="1"><stop stop-color="#d6bd8f"/><stop offset="1" stop-color="#f0dec0"/></linearGradient>
+ <pattern id="dots" width="24" height="24" patternUnits="userSpaceOnUse"><circle cx="1.5" cy="1.5" r="1" fill="#9fada5" opacity=".12"/></pattern>
+ <filter id="shadow"><feDropShadow dx="0" dy="16" stdDeviation="14" flood-opacity=".25"/></filter>
+</defs>
+<rect width="1200" height="540" rx="18" fill="url(#bg)"/><rect width="1200" height="540" fill="url(#dots)"/>
+<circle cx="1050" cy="-65" r="300" fill="none" stroke="#a4ae97" opacity=".10" stroke-width="1"/><circle cx="1050" cy="-65" r="220" fill="none" stroke="#a4ae97" opacity=".13" stroke-width="1"/>
+<text x="64" y="62" font-family="Arial,sans-serif" font-size="14" letter-spacing="4" fill="#d6bd8f">R / A / E</text><path d="M168 55 H1136" stroke="#748982" opacity=".4"/>
+<text x="64" y="122" font-family="Georgia,serif" font-size="46" fill="#f2ede1">Clarity before delivery.</text>
+<text x="65" y="151" font-family="Arial,sans-serif" font-size="15" fill="#b8c7bd">From unstructured client requests to reviewable consulting proposals.</text>
+<g filter="url(#shadow)">
+<rect x="63" y="214" width="297" height="232" rx="6" fill="#efece3" transform="rotate(-3 211 330)"/>
+<rect x="87" y="232" width="262" height="202" rx="3" fill="#f7f3e9"/>
+<text x="108" y="264" font-family="Arial" font-size="11" letter-spacing="2" fill="#6e776d">01 / CLIENT BRIEF</text>
+<text x="108" y="305" font-family="Georgia" font-size="28" fill="#233b3d">What do we</text>
+<text x="108" y="337" font-family="Georgia" font-size="28" fill="#233b3d">actually need?</text>
+<path d="M109 358 H317 M109 374 H276 M109 390 H302" stroke="#879189" stroke-width="2" opacity=".6"/>
+</g>
+<path d="M369 327 C415 327 405 327 451 327" stroke="url(#gold)" stroke-width="1.8" fill="none" stroke-dasharray="4 7"/><circle cx="449" cy="327" r="4" fill="#e9d2aa"/>
+<g filter="url(#shadow)">
+<rect x="455" y="233" width="300" height="202" rx="7" fill="#24393a" stroke="#a6baa9" stroke-opacity=".65"/>
+<text x="482" y="266" font-family="Arial" font-size="11" letter-spacing="2" fill="#d8c6a6">02 / ALIGNMENT</text>
+<text x="482" y="310" font-family="Georgia" font-size="29" fill="#fff3df">Questions first.</text>
+<rect x="482" y="338" width="245" height="30" rx="3" fill="#395250"/>
+<text x="496" y="357" font-family="Arial" font-size="13" fill="#e1e9dc">✓ Scope &amp; boundaries</text>
+<rect x="482" y="375" width="245" height="30" rx="3" fill="#395250"/>
+<text x="496" y="394" font-family="Arial" font-size="13" fill="#e1e9dc">✓ Human-confirmed intent</text>
+</g>
+<path d="M758 327 C802 327 795 327 840 327" stroke="url(#gold)" stroke-width="1.8" fill="none" stroke-dasharray="4 7"/><circle cx="837" cy="327" r="4" fill="#e9d2aa"/>
+<g filter="url(#shadow)">
+<rect x="843" y="211" width="291" height="241" rx="6" fill="#efece3"/>
+<rect x="857" y="225" width="263" height="213" rx="3" fill="#fffaf0" stroke="#ded6c7"/>
+<text x="883" y="257" font-family="Arial" font-size="11" letter-spacing="2" fill="#6e776d">03 / PROPOSAL STUDIO</text>
+<text x="883" y="301" font-family="Georgia" font-size="31" fill="#243b39">An approach</text>
+<text x="883" y="336" font-family="Georgia" font-size="31" fill="#243b39">you can defend.</text>
+<path d="M883 355 H1091 M883 373 H1072 M883 391 H1083" stroke="#b2b4a9" stroke-width="2"/>
+<rect x="1001" y="408" width="88" height="23" rx="2" fill="#e7d3b0"/><text x="1012" y="424" font-family="Arial" font-size="11" letter-spacing="1" fill="#564833">DRAFT</text>
+</g>
+<path d="M63 488 H1136" stroke="#748982" opacity=".40"/>
+<text x="64" y="514" font-family="Arial" font-size="12" fill="#b7c6bc" letter-spacing="1.2">BRIEF → CLARIFY → CONFIRM → DESIGN → COMPOSE → REVIEW</text>
+<text x="1135" y="514" font-family="Arial" font-size="12" text-anchor="end" fill="#d6bd8f">HUMAN IN THE LOOP  /  ALWAYS</text>
+</svg>

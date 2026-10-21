@@ -1,0 +1,23 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "services": {
+    "app": {
+      "root": ".",
+      "framework": "fastapi"
+    },
+    "frontend": {
+      "root": "frontend",
+      "framework": "nextjs"
+    }
+  },
+  "rewrites": [
+    { "source": "/requirements/(.*)", "destination": { "service": "app" } },
+    { "source": "/plans/(.*)", "destination": { "service": "app" } },
+    { "source": "/changes/(.*)", "destination": { "service": "app" } },
+    { "source": "/completion/(.*)", "destination": { "service": "app" } },
+    { "source": "/knowledge/(.*)", "destination": { "service": "app" } },
+    { "source": "/consulting/(.*)", "destination": { "service": "app" } },
+    { "source": "/health", "destination": { "service": "app" } },
+    { "source": "/(.*)", "destination": { "service": "frontend" } }
+  ]
+}
